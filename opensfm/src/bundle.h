@@ -170,6 +170,7 @@ struct BAObservation {
   BACamera *camera;
   BAShot *shot;
   BAPoint *point;
+  double std_deviation;
 };
 
 struct BARotationPrior {
@@ -969,13 +970,15 @@ class BundleAdjuster {
       const std::string &shot,
       const std::string &point,
       double x,
-      double y) {
+      double y,
+      double std_deviation) {
     BAObservation o;
     o.shot = &shots_[shot];
     o.camera = cameras_[o.shot->camera].get();
     o.point = &points_[point];
     o.coordinates[0] = x;
     o.coordinates[1] = y;
+    o.std_deviation = std_deviation;
     observations_.push_back(o);
   }
 
@@ -1169,7 +1172,7 @@ class BundleAdjuster {
               new ceres::AutoDiffCostFunction<PerspectiveReprojectionError, 2, 3, 6, 3>(
                   new PerspectiveReprojectionError(observation.coordinates[0],
                                                    observation.coordinates[1],
-                                                   reprojection_error_sd_));
+                                                   observation.std_deviation));
 
           problem.AddResidualBlock(cost_function,
                                    loss,
@@ -1185,7 +1188,7 @@ class BundleAdjuster {
               new ceres::AutoDiffCostFunction<BrownPerspectiveReprojectionError, 2, 9, 6, 3>(
                   new BrownPerspectiveReprojectionError(observation.coordinates[0],
                                                         observation.coordinates[1],
-                                                        reprojection_error_sd_));
+                                                        observation.std_deviation));
 
           problem.AddResidualBlock(cost_function,
                                    loss,
@@ -1201,7 +1204,7 @@ class BundleAdjuster {
               new ceres::AutoDiffCostFunction<FisheyeReprojectionError, 2, 3, 6, 3>(
                   new FisheyeReprojectionError(observation.coordinates[0],
                                                observation.coordinates[1],
-                                               reprojection_error_sd_));
+                                               observation.std_deviation));
 
           problem.AddResidualBlock(cost_function,
                                    loss,
@@ -1217,7 +1220,7 @@ class BundleAdjuster {
               new ceres::AutoDiffCostFunction<EquirectangularReprojectionError, 3, 6, 3>(
                   new EquirectangularReprojectionError(observation.coordinates[0],
                                                        observation.coordinates[1],
-                                                       reprojection_error_sd_));
+                                                       observation.std_deviation));
 
           problem.AddResidualBlock(cost_function,
                                    loss,

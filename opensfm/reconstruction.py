@@ -117,8 +117,10 @@ def bundle(graph, reconstruction, gcp, config):
         if shot_id in graph:
             for track in graph[shot_id]:
                 if track in reconstruction.points:
+                    point = graph[shot_id][track]['feature']
+                    scale = graph[shot_id][track]['feature_scale']
                     ba.add_observation(shot_id, track,
-                                       *graph[shot_id][track]['feature'])
+                                       point[0], point[1], scale)
 
     if config['bundle_use_gps']:
         for shot in reconstruction.shots.values():
@@ -201,8 +203,10 @@ def bundle_single_view(graph, reconstruction, shot_id, config):
             track = reconstruction.points[track_id]
             x = track.coordinates
             ba.add_point(track_id, x[0], x[1], x[2], True)
+            point = graph[shot_id][track_id]['feature']
+            scale = graph[shot_id][track_id]['feature_scale']
             ba.add_observation(shot_id, track_id,
-                               *graph[shot_id][track_id]['feature'])
+                                point[0], point[1], scale)
 
     if config['bundle_use_gps']:
         g = shot.metadata.gps_position
@@ -280,8 +284,10 @@ def bundle_local(graph, reconstruction, gcp, central_shot_id, config):
         if shot_id in graph:
             for track in graph[shot_id]:
                 if track in point_ids:
+                    point = graph[shot_id][track]['feature']
+                    scale = graph[shot_id][track]['feature_scale']
                     ba.add_observation(shot_id, track,
-                                       *graph[shot_id][track]['feature'])
+                                       point[0], point[1], scale)
 
     if config['bundle_use_gps']:
         for shot_id in interior:
