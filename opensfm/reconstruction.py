@@ -404,7 +404,8 @@ def pairwise_reconstructability(common_tracks, rotation_inliers):
     """Likeliness of an image pair giving a good initial reconstruction."""
     outliers = common_tracks - rotation_inliers
     outlier_ratio = float(outliers) / common_tracks
-    if outlier_ratio >= 0.3:
+    logger.debug(" outlier_ratio = {}".format(outlier_ratio))
+    if outlier_ratio >= 0.2:
         return outliers
     else:
         return 0
